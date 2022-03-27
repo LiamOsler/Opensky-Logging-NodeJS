@@ -4,7 +4,7 @@ Logs all Callsigns reported on Opensky every 10 seconds using the OpenSky REST A
 
 ### server.js:
 
-Writing the the logs to a file name based on the unix datetime with a ```.txt``` file extension (this will create a new file witha  :
+Writing the the logs to a file name based on the unix datetime with a ```.txt``` file extension (this will create a new file in the ```public/data/all/``` directory every time the ```cron-job``` runs:
 ```js
 const cron = require('node-cron');
 const axios = require('axios');
