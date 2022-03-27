@@ -231,8 +231,7 @@ app.use(express.static('public'))
 app.listen(port, () => {
   console.log(`Flights3D listening on port ${port}`);
 })
-``
-
+```
 
 
 OpenSky:
