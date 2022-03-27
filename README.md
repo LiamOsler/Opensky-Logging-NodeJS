@@ -2,15 +2,30 @@
 
 Logging use NodeJS and the OpenSky REST API.
 
-## Requirments:
+## Requirements:
 Via ``npm``:
-- cron
 - axios
+- express
 - fs
+- node-cron
+
+axios:
+- used to make http requests to 'https://opensky-network.org/api/states/all', the OpenSky REST API.
+
+express:
+- serves the stored data and index.html over http
+
+fs:
+- for reading and writing to the file system
+
+node-cron:
+- schedules the http requests
 
 Via ```npm```, CDN or locally served:
 - ThreeJS
 - OrbitControls for ThreeJS
+
+I host these files locally in the ```public/scripts/``` folder as they're only used by the frontend viewer application 
 
 
 ### server.js:
@@ -135,6 +150,88 @@ if (!fs.existsSync('public/data/aircraft/')){
     fs.mkdirSync('public/data/aircraft/');
 }
 ```
+
+We also want to serve these files, we can do this easily with express, everything in the ```public``` (particularly ```public/data/```, where the logged data is stored) directory will be served on port 3000:
+```
+const app = express();
+const port = 3000;
+
+app.use(express.static('public'))
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+})
+```
+Additionally, we can add our index.html file to the ```public``` folder, which will function as the clientside access point for the application:
+
+With each of these elements all together we have this in the ```server.js``` file:
+
+```js
+const express = require('express');
+const cron = require('node-cron');
+const axios = require('axios');
+const fs = require('fs')
+
+if (!fs.existsSync('public/data/all/')){
+    fs.mkdirSync('public/data/all/');
+}
+if (!fs.existsSync('public/data/aircraft/')){
+    fs.mkdirSync('public/data/aircraft/');
+}
+
+cron.schedule('*/20 * * * * *', () => {
+    axios
+        .get('https://opensky-network.org/api/states/all')
+        .then(res => {
+            let time = res.data.time;
+            let fileString = 'public/data/all/'+time+'.txt';
+            let latest = 'public/data/all/latest.txt';
+
+
+            fs.writeFile(latest, JSON.stringify(res.data), err => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+            });
+
+            for(let item of res.data.states){
+                let dir = 'public/data/aircraft/' + item[0] +'/';
+                if (!fs.existsSync(dir)){
+                    fs.mkdirSync(dir);
+                }
+                let fileString = 'public/data/aircraft/'+item[0] +'/' +item[4]+'.txt';
+                let latest = 'public/data/aircraft/'+item[0] +'/ latest.txt';
+                fs.writeFile(fileString, JSON.stringify(item), err => {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                });
+                fs.writeFile(latest, JSON.stringify(item), err => {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                });
+            }
+
+        })
+        .catch(error => {
+            console.error(error);
+        })
+});
+
+
+const app = express();
+const port = 3000;
+
+app.use(express.static('public'))
+
+app.listen(port, () => {
+  console.log(`Flights3D listening on port ${port}`);
+})
+``
 
 
 
