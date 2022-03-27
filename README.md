@@ -29,9 +29,8 @@ cron.schedule('*/10 * * * * *', () => {
 });
 ```
 
-For convenience, create a log called "latest" which is continuously updated with the most recently reported log:
-```
-
+For convenience, we can additionally create a log called ```latest.txt``` which is continuously updated with the most recently reported log every time the cron job runs:
+```js
 cron.schedule('*/20 * * * * *', () => {
     axios
         .get('https://opensky-network.org/api/states/all')
@@ -59,15 +58,15 @@ cron.schedule('*/20 * * * * *', () => {
 });
 ```
 
-Retrieving the latest log using setInterval (in this example, the latest log is requested every 1000 ms:
+Retrieving the latest log using setInterval (in this example, the latest log is requested every 1000 ms, on the client side:
 ```js
-    setInterval(function () {
-        fetch('data/all/latest.txt')
-            .then(response => response.json())
-            .then(data => 
-                aircraftLocations = data
-            );
-    }, 1000);
+setInterval(function () {
+    fetch('data/all/latest.txt')
+        .then(response => response.json())
+        .then(data => 
+            aircraftLocations = data
+        );
+}, 1000);
 ```
 
 
@@ -81,7 +80,6 @@ cron.schedule('*/20 * * * * *', () => {
             let time = res.data.time;
             let fileString = 'public/data/all/'+time+'.txt';
             let latest = 'public/data/all/latest.txt';
-
 
             fs.writeFile(latest, JSON.stringify(res.data), err => {
                 if (err) {
@@ -116,6 +114,15 @@ cron.schedule('*/20 * * * * *', () => {
             console.error(error);
         })
 });
+```
+Additionally, we may want to check that the file structure for the data folders exists using ```fs.existsSync``` before the cron scheduled job:
+```
+if (!fs.existsSync('public/data/all/')){
+    fs.mkdirSync('public/data/all/');
+}
+if (!fs.existsSync('public/data/aircraft/')){
+    fs.mkdirSync('public/data/aircraft/');
+}
 ```
 
 
