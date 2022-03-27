@@ -1,6 +1,17 @@
 # Opensky-Logging-NodeJS
 
-Logs all Callsigns reported on Opensky every 10 seconds using the OpenSky REST API.
+Logging use NodeJS and the OpenSky REST API.
+
+## Requirments:
+Via ``npm``:
+- cron
+- axios
+- fs
+
+Via ```npm```, CDN or locally served:
+- ThreeJS
+- OrbitControls for ThreeJS
+
 
 ### server.js:
 
