@@ -21,9 +21,6 @@ fs:
 node-cron:
 - schedules the http requests
 
-Via ```npm```, CDN or locally served:
-- ThreeJS
-- OrbitControls for ThreeJS
 
 I host these files locally in the ```public/scripts/``` folder as they're only used by the frontend viewer application 
 
